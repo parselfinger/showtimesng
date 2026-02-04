@@ -1,0 +1,208 @@
+---
+import { formatShowtime, formatDayShort, formatDayNum, formatMonthShort, groupShowtimesByDate, slugify } from '../lib/utils';
+
+interface Props {
+  showtimes: any[];
+  showCinema?: boolean;
+  showMovie?: boolean;
+}
+
+const { showtimes, showCinema = false, showMovie = false } = Astro.props;
+
+// Group by date
+const grouped = groupShowtimesByDate(showtimes);
+const dates = Object.keys(grouped).sort();
+
+// Helper to group by cinema
+function groupByCinema(times: any[]) {
+  const result: Record<string, { cinema: any; times: any[] }> = {};
+  for (const st of times) {
+    if (!result[st.cinema.id]) {
+      result[st.cinema.id] = { cinema: st.cinema, times: [] };
+    }
+    result[st.cinema.id].times.push(st);
+  }
+  return Object.values(result);
+}
+
+// Helper to group by movie
+function groupByMovie(times: any[]) {
+  const result: Record<string, { movie: any; times: any[] }> = {};
+  for (const st of times) {
+    if (!result[st.movie.id]) {
+      result[st.movie.id] = { movie: st.movie, times: [] };
+    }
+    result[st.movie.id].times.push(st);
+  }
+  return Object.values(result);
+}
+---
+
+<div class="showtimes-container">
+  <!-- Horizontal Date Picker -->
+  <div class="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+    {dates.map((date, index) => {
+      const sampleTime = grouped[date][0].start_time;
+      return (
+        <button
+          type="button"
+          class:list={[
+            'date-btn flex flex-col items-center min-w-[70px] px-4 py-3 rounded-lg transition-all',
+            index === 0 ? 'bg-accent text-white' : 'bg-secondary hover:bg-opacity-80'
+          ]}
+          data-date={date}
+        >
+          <span class="text-xs uppercase">{formatDayShort(sampleTime)}</span>
+          <span class="text-xl font-bold">{formatDayNum(sampleTime)}</span>
+          <span class="text-xs">{formatMonthShort(sampleTime)}</span>
+        </button>
+      );
+    })}
+  </div>
+
+  <!-- Showtimes for each date (hidden by default, shown via JS) -->
+  {dates.map((date, index) => (
+    <div
+      class:list={['date-content', index === 0 ? '' : 'hidden']}
+      data-date={date}
+    >
+      <div class="space-y-3">
+        {showCinema && groupByCinema(grouped[date]).map(({ cinema, times: cinemaTimes }) => (
+          <div class="bg-secondary rounded-lg p-4">
+            <a href={`/cinemas/${cinema.id}-${slugify(cinema.name)}`} class="font-medium hover:text-accent">
+              {cinema.name}
+            </a>
+            {(cinema.verbose_location || cinema.location) && (
+              <p class="text-sm text-gray-400">{cinema.verbose_location || cinema.location}</p>
+            )}
+            <div class="mt-3 flex flex-wrap gap-2">
+              {cinemaTimes.map((st: any) => (
+                st.movie_url ? (
+                  <a
+                    href={st.movie_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="px-3 py-2 bg-primary rounded text-sm hover:bg-accent transition-colors"
+                  >
+                    {formatShowtime(st.start_time)}
+                    {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                  </a>
+                ) : (
+                  <span class="px-3 py-2 bg-primary rounded text-sm">
+                    {formatShowtime(st.start_time)}
+                    {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                  </span>
+                )
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {showMovie && groupByMovie(grouped[date]).map(({ movie, times: movieTimes }) => (
+          <div class="bg-secondary rounded-lg p-4">
+            <a href={`/movies/${movie.id}-${slugify(movie.title)}`} class="font-medium hover:text-accent">
+              {movie.title}
+            </a>
+            <div class="mt-3 flex flex-wrap gap-2">
+              {movieTimes.map((st: any) => (
+                st.movie_url ? (
+                  <a
+                    href={st.movie_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="px-3 py-2 bg-primary rounded text-sm hover:bg-accent transition-colors"
+                  >
+                    {formatShowtime(st.start_time)}
+                    {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                  </a>
+                ) : (
+                  <span class="px-3 py-2 bg-primary rounded text-sm">
+                    {formatShowtime(st.start_time)}
+                    {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                  </span>
+                )
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {!showCinema && !showMovie && (
+          <div class="flex flex-wrap gap-2">
+            {grouped[date].map((st: any) => (
+              st.movie_url ? (
+                <a
+                  href={st.movie_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="px-3 py-2 bg-secondary rounded text-sm hover:bg-accent transition-colors"
+                >
+                  {formatShowtime(st.start_time)}
+                  {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                </a>
+              ) : (
+                <span class="px-3 py-2 bg-secondary rounded text-sm">
+                  {formatShowtime(st.start_time)}
+                  {st.screen_type !== '2D' && <span class="ml-1 text-xs">({st.screen_type})</span>}
+                </span>
+              )
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function init() {
+      const containers = document.querySelectorAll('.showtimes-container');
+
+      containers.forEach(container => {
+        const buttons = container.querySelectorAll('.date-btn');
+        const contents = container.querySelectorAll('.date-content');
+
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const date = btn.getAttribute('data-date');
+
+            // Update button styles
+            buttons.forEach(b => {
+              b.classList.remove('bg-accent', 'text-white');
+              b.classList.add('bg-secondary');
+            });
+            btn.classList.remove('bg-secondary');
+            btn.classList.add('bg-accent', 'text-white');
+
+            // Show/hide content
+            contents.forEach(content => {
+              if (content.getAttribute('data-date') === date) {
+                content.classList.remove('hidden');
+              } else {
+                content.classList.add('hidden');
+              }
+            });
+          });
+        });
+      });
+    }
+
+    // Run on initial load and on Astro page transitions
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    document.addEventListener('astro:page-load', init);
+  })();
+</script>
