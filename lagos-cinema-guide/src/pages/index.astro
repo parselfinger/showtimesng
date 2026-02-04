@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MovieCard from '../components/MovieCard.astro';
+import { getNowShowingMovies } from '../lib/queries';
+
+const movies = await getNowShowingMovies();
+---
+
+<BaseLayout
+  title="Now Showing in Lagos"
+  description="Find movie showtimes at cinemas across Lagos. See what's playing at Filmhouse, Genesis, Silverbird and more."
+>
+  <section>
+    <h1 class="text-3xl font-bold mb-2">Now Showing in Lagos</h1>
+    <p class="text-gray-400 mb-8">
+      Find showtimes at all major cinemas across Lagos
+    </p>
+
+    {movies.length > 0 ? (
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {movies.map((movie) => (
+          <MovieCard movie={movie} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-400">No movies currently showing. Check back later.</p>
+    )}
+  </section>
+</BaseLayout>
