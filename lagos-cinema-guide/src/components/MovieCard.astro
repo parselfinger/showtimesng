@@ -1,0 +1,45 @@
+---
+import type { Movie } from '../lib/queries';
+import { slugify, formatDuration, formatRating } from '../lib/utils';
+
+interface Props {
+  movie: Movie;
+  href?: string;
+}
+
+const { movie, href } = Astro.props;
+const link = href || `/movies/${movie.id}-${slugify(movie.title)}`;
+---
+
+<a href={link} class="group block">
+  <article class="bg-secondary rounded-lg overflow-hidden transition-transform group-hover:scale-105">
+    <div class="aspect-[2/3] relative bg-gray-800">
+      {movie.poster_url ? (
+        <img
+          src={movie.poster_url}
+          alt={movie.title}
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+      ) : (
+        <div class="w-full h-full flex items-center justify-center text-gray-500">
+          <span class="text-4xl">🎬</span>
+        </div>
+      )}
+    </div>
+    <div class="p-4">
+      <h3 class="font-semibold text-lg truncate group-hover:text-accent transition-colors">
+        {movie.title}
+      </h3>
+      <div class="mt-2 flex items-center gap-2 text-sm text-gray-400">
+        {movie.duration_minutes && <span>{formatDuration(movie.duration_minutes)}</span>}
+        {movie.rating && (
+          <span class="px-2 py-0.5 bg-primary rounded flex items-center gap-1">
+            <span class="text-yellow-500">★</span>
+            {formatRating(movie.rating)}
+          </span>
+        )}
+      </div>
+    </div>
+  </article>
+</a>
