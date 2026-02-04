@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ShowtimesWithDatePicker from '../../components/ShowtimesWithDatePicker.astro';
+import StructuredData from '../../components/StructuredData.astro';
+import { getCinemaById, getShowtimesForCinema, getAllCinemaIds, getDisplayLocation } from '../../lib/queries';
+import { slugify } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const cinemas = await getAllCinemaIds();
+  return cinemas.map((cinema) => ({
+    params: { id: `${cinema.id}-${slugify(cinema.name)}` },
+  }));
+}
+
+const { id } = Astro.params;
+const cinemaId = parseInt(id.split('-')[0]);
+const cinema = await getCinemaById(cinemaId);
+const showtimes = await getShowtimesForCinema(cinema.id);
+const displayLocation = getDisplayLocation(cinema);
+---
+
+<BaseLayout
+  title={cinema.name}
+  description={`Movie showtimes at ${cinema.name}${displayLocation ? `, ${displayLocation}` : ''}. See what's playing and book tickets.`}
+>
+  <StructuredData type="cinema" data={cinema} />
+
+  <article>
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold">{cinema.name}</h1>
+      {displayLocation && (
+        <p class="mt-2 text-gray-400">{displayLocation}</p>
+      )}
+      {cinema.address && (
+        <p class="mt-1 text-sm text-gray-500">{cinema.address}</p>
+      )}
+    </header>
+
+    <!-- Showtimes -->
+    <section>
+      <h2 class="text-2xl font-bold mb-6">Now Showing</h2>
+
+      {showtimes && showtimes.length > 0 ? (
+        <ShowtimesWithDatePicker showtimes={showtimes} showMovie={true} />
+      ) : (
+        <p class="text-gray-400">No showtimes available at the moment.</p>
+      )}
+    </section>
+  </article>
+</BaseLayout>

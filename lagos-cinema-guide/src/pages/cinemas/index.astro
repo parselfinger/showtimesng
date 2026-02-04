@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CinemaCard from '../../components/CinemaCard.astro';
+import { getCinemas } from '../../lib/queries';
+
+const cinemas = await getCinemas();
+---
+
+<BaseLayout
+  title="Lagos Cinema Directory"
+  description="Find all cinemas in Lagos - Filmhouse, Genesis, Silverbird and more. See locations and showtimes."
+>
+  <section>
+    <h1 class="text-3xl font-bold mb-8">Cinemas in Lagos</h1>
+
+    {cinemas.length > 0 ? (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {cinemas.map((cinema) => (
+          <CinemaCard cinema={cinema} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-400">No cinemas found. Check back later.</p>
+    )}
+  </section>
+</BaseLayout>
