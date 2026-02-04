@@ -1,0 +1,61 @@
+---
+import type { Movie, Cinema } from '../lib/queries';
+
+interface Props {
+  type: 'movie' | 'cinema' | 'showtime';
+  data: any;
+}
+
+const { type, data } = Astro.props;
+
+function generateMovieSchema(movie: Movie) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Movie',
+    name: movie.title,
+    image: movie.poster_url,
+    description: movie.description,
+    duration: movie.duration_minutes ? `PT${movie.duration_minutes}M` : undefined,
+    dateCreated: movie.release_year ? `${movie.release_year}` : undefined,
+  };
+}
+
+function generateCinemaSchema(cinema: Cinema) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MovieTheater',
+    name: cinema.name,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: cinema.location,
+      addressCountry: 'NG',
+    },
+  };
+}
+
+function generateShowtimeSchema(showtime: any, movie: Movie, cinema: Cinema) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ScreeningEvent',
+    name: `${movie.title} at ${cinema.name}`,
+    startDate: showtime.start_time,
+    location: generateCinemaSchema(cinema),
+    workPresented: generateMovieSchema(movie),
+  };
+}
+
+let schema;
+switch (type) {
+  case 'movie':
+    schema = generateMovieSchema(data);
+    break;
+  case 'cinema':
+    schema = generateCinemaSchema(data);
+    break;
+  case 'showtime':
+    schema = generateShowtimeSchema(data.showtime, data.movie, data.cinema);
+    break;
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
