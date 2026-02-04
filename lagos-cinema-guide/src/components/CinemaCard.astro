@@ -1,0 +1,27 @@
+---
+import type { Cinema } from '../lib/queries';
+import { getDisplayLocation } from '../lib/queries';
+import { slugify } from '../lib/utils';
+
+interface Props {
+  cinema: Cinema;
+  href?: string;
+}
+
+const { cinema, href } = Astro.props;
+const link = href || `/cinemas/${cinema.id}-${slugify(cinema.name)}`;
+const displayLocation = getDisplayLocation(cinema);
+---
+
+<a href={link} class="group block">
+  <article class="bg-secondary rounded-lg p-6 transition-all group-hover:bg-opacity-80">
+    <h3 class="font-semibold text-lg group-hover:text-accent transition-colors">
+      {cinema.name}
+    </h3>
+    {displayLocation && (
+      <p class="mt-2 text-gray-400 text-sm">
+        {displayLocation}
+      </p>
+    )}
+  </article>
+</a>
