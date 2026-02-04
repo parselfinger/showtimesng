@@ -1,29 +1,24 @@
-# Astro Starter Kit: Minimal
+# Showtimes NG
 
-```sh
-npm create astro@latest -- --template minimal
-```
+A Lagos Cinema Guide website that aggregates movie showtimes from cinemas across Lagos.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Built with Astro, Supabase, and Tailwind CSS.
 
 ## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
 
 ```text
 /
 ├── public/
+│   ├── favicon.svg
+│   └── robots.txt
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/
+│   ├── layouts/
+│   ├── lib/
+│   ├── pages/
+│   └── styles/
 └── package.json
 ```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
 
 ## 🧞 Commands
 
