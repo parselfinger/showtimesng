@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lagoscinema.ng/sitemap-index.xml
+Sitemap: https://showtimes.ng/sitemap-index.xml

@@ -7,8 +7,8 @@ interface Props {
 }
 
 const { title, description, image, canonicalUrl } = Astro.props;
-const siteUrl = Astro.site?.toString() || 'https://lagoscinema.ng';
-const fullTitle = `${title} | Lagos Cinema Guide`;
+const siteUrl = Astro.site?.toString() || 'https://showtimes.ng';
+const fullTitle = `${title} | Showtimes NG`;
 const ogImage = image || `${siteUrl}/og-default.jpg`;
 const canonical = canonicalUrl || Astro.url.href;
 ---
