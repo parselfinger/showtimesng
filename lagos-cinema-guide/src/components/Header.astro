@@ -1,0 +1,35 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header class="bg-secondary py-4 sticky top-0 z-50">
+  <nav class="container mx-auto px-4 flex items-center justify-between">
+    <a href="/" class="text-2xl font-bold text-accent">
+      Lagos Cinema
+    </a>
+    <ul class="flex gap-6">
+      <li>
+        <a
+          href="/movies"
+          class:list={[
+            'hover:text-accent transition-colors',
+            { 'text-accent': currentPath.startsWith('/movies') },
+          ]}
+        >
+          Movies
+        </a>
+      </li>
+      <li>
+        <a
+          href="/cinemas"
+          class:list={[
+            'hover:text-accent transition-colors',
+            { 'text-accent': currentPath.startsWith('/cinemas') },
+          ]}
+        >
+          Cinemas
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
