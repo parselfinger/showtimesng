@@ -9,6 +9,8 @@ interface Props {
 const { type, data } = Astro.props;
 
 function generateMovieSchema(movie: Movie) {
+  const rating = movie.rating ?? movie.metacritic_rating ?? movie.rotten_tomatoes_rating;
+  const isImdb = movie.rating != null;
   return {
     '@context': 'https://schema.org',
     '@type': 'Movie',
@@ -17,6 +19,15 @@ function generateMovieSchema(movie: Movie) {
     description: movie.description,
     duration: movie.duration_minutes ? `PT${movie.duration_minutes}M` : undefined,
     dateCreated: movie.release_year ? `${movie.release_year}` : undefined,
+    ...(rating != null && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: rating,
+        bestRating: isImdb ? 10 : 100,
+        worstRating: 0,
+        ratingCount: 1,
+      },
+    }),
   };
 }
 

@@ -9,6 +9,8 @@ export interface Movie {
   duration_minutes: number | null;
   rating: number | null;
   poster_url: string | null;
+  metacritic_rating: number | null;
+  rotten_tomatoes_rating: number | null;
   created_at: string;
   updated_at: string;
 }

@@ -31,12 +31,24 @@ const link = href || `/movies/${movie.id}-${slugify(movie.title)}`;
       <h3 class="font-semibold text-lg truncate group-hover:text-accent transition-colors">
         {movie.title}
       </h3>
-      <div class="mt-2 flex items-center gap-2 text-sm text-gray-400">
+      <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-400 [text-shadow:none]">
         {movie.duration_minutes && <span>{formatDuration(movie.duration_minutes)}</span>}
-        {movie.rating && (
-          <span class="px-2 py-0.5 bg-primary rounded flex items-center gap-1">
-            <span class="text-yellow-500">★</span>
+        {movie.rating != null && (
+          <span class="inline-flex items-center gap-1 [text-shadow:none]" title="IMDb">
+            <img src="/icons/imdb.svg" alt="IMDb" class="h-4 w-4 flex-shrink-0 object-contain" width="16" height="16" loading="lazy" />
             {formatRating(movie.rating)}
+          </span>
+        )}
+        {movie.metacritic_rating != null && (
+          <span class="inline-flex items-center gap-1 [text-shadow:none]" title="Metacritic">
+            <img src="/icons/metacritic.svg" alt="Metacritic" class="h-4 w-4 object-contain" width="16" height="16" />
+            {movie.metacritic_rating}
+          </span>
+        )}
+        {movie.rotten_tomatoes_rating != null && (
+          <span class="inline-flex items-center gap-1 [text-shadow:none]" title="Rotten Tomatoes">
+            <img src="/icons/rotten-tomatoes.svg" alt="Rotten Tomatoes" class="h-4 w-4 object-contain" width="16" height="16" />
+            {movie.rotten_tomatoes_rating}%
           </span>
         )}
       </div>
