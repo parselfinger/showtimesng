@@ -9,8 +9,10 @@ interface Props {
 const { title, description, image, canonicalUrl } = Astro.props;
 const siteUrl = Astro.site?.toString() || 'https://showtimes.ng';
 const fullTitle = `${title} | Showtimes NG`;
-const ogImage = image || `${siteUrl}/og-default.jpg`;
-const canonical = canonicalUrl || Astro.url.href;
+const ogImage = image
+  ? (image.startsWith('http') ? image : `${siteUrl}${image.startsWith('/') ? '' : '/'}${image}`)
+  : `${siteUrl}/logo.svg`;
+const canonical = canonicalUrl || `${siteUrl}${Astro.url.pathname.replace(/\/$/, '') || '/'}`;
 ---
 
 <meta charset="UTF-8" />
@@ -24,6 +26,7 @@ const canonical = canonicalUrl || Astro.url.href;
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={canonical} />
+<meta property="og:site_name" content="Showtimes NG" />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImage} />
