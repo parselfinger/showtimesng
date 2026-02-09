@@ -58,15 +58,29 @@ export async function getNowShowingMovies() {
     .from('movies')
     .select(`
       *,
-      showtimes!inner(id)
+      showtimes!inner(id, start_time)
     `)
-    .gte('showtimes.start_time', now)
-    .order('title');
+    .gte('showtimes.start_time', now);
 
   if (error) throw error;
 
-  // Remove the showtimes data from the result (we only needed it for filtering)
-  return (data || []).map(({ showtimes, ...movie }) => movie) as Movie[];
+  // Get earliest showtime per movie, sort by earliest showtime then alphabetically
+  const moviesWithEarliest = (data || []).map(({ showtimes, ...movie }) => {
+    const earliestShowtime = (showtimes as { start_time: string }[]).reduce(
+      (earliest, st) => (!earliest || st.start_time < earliest ? st.start_time : earliest),
+      null as string | null
+    );
+    return { ...movie, earliestShowtime };
+  });
+
+  moviesWithEarliest.sort((a, b) => {
+    const timeA = a.earliestShowtime ?? '';
+    const timeB = b.earliestShowtime ?? '';
+    if (timeA !== timeB) return timeA.localeCompare(timeB);
+    return (a.title ?? '').localeCompare(b.title ?? '');
+  });
+
+  return moviesWithEarliest.map(({ earliestShowtime, ...movie }) => movie) as Movie[];
 }
 
 // Get single movie by ID
